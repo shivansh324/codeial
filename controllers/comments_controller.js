@@ -14,3 +14,18 @@ module.exports.create = function(req, res){//.then() return a promise or error s
         }).catch((Error)=>{console.log("Error in creating a comment to post link"); return res.redirect('/');});
     }).catch((Error)=>{console.log("Error in creating a post to comment link"); return res.redirect('/');});
 };
+
+module.exports.destroy = function(req, res){
+    Comment.findById(req.params.id).then((comment)=>{
+        if(comment.user == req.user.id){
+            
+            let post_id = comment.post;
+
+            comment.deleteOne();
+
+            Post.findByIdAndUpdate(post_id, {$pull: {comments: req.params.id}})
+            .then(()=> {return res.redirect('back');})
+            .catch((Error)=>{return res.redirect('back');})
+        }
+    })
+}
