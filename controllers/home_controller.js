@@ -1,33 +1,33 @@
 const Post = require('../models/post');
 const User = require('../models/user');
 
-module.exports.home= function(req,res){
-
-    // Post.find({}).then((posts)=>{
-
-    //     return res.render('home',{
-    //         title: "Codeial | Home",
-    //         posts: posts
-    //     });
-    // }).catch((Error)=>{console.log('error')});
-    Post.find({})
-    .populate('user')
-    .populate({
-            path: 'comments',
-            populate: {
-                path: 'user'
-            }
-    })
-    .then((posts)=>{
-
-        User.find({}).then((users)=>{
-            return res.render('home',{
-                title: "Codeial | Home",
-                posts: posts,
-                all_users: users
-            });
-        });
-        
-    }).catch((Error)=>{console.log('error')});
+module.exports.home=async function(req,res){
+    try{
+        //populate the user of each post
+        let posts = await Post.find({})
+        .populate('user')
+        .populate({
+                path: 'comments',
+                populate: {
+                    path: 'user'
+                }
+        })
     
+        let users = await User.find({});
+    
+        return res.render('home',{
+            title: "Codeial | Home",
+            posts: posts,
+            all_users: users
+        });
+    }catch(err){
+        console.log('Error',err);
+        return;
+    }
+
+    //M1 using Post().then()
+    //M2 using let posts = Post().exec()
+    // then using posts.then()
+    //M3 using asyn and await
+
 }
