@@ -19,6 +19,7 @@ module.exports.create = async function(req, res){//.then() return a promise or e
         return res.redirect('/');
     }catch(err){
         console.log('Error',err);
+        return;
     }
 };  
 
@@ -36,5 +37,6 @@ module.exports.destroy = async function(req, res){
         return res.redirect('back');
     }catch(err){
         console.log('Error',err);
+        return;
     }
 }

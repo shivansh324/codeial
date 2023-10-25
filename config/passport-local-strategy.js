@@ -6,18 +6,21 @@ const User = require('../models/user');
 
 //Authentication using passport
 passport.use(new LocalStrategy({
-        usernameField: 'email'
+        usernameField: 'email',
+        passReqToCallback: true
     },
-    function(email,password,done){//done already exists in passport.js lib
+    function(req, email,password,done){//"done" already exists in passport.js lib
         //find a user and establish the identity        
         User.findOne({email: email}).then((user)=>{
             if(!user || user.password != password){
-                console.log('Invalid user-name, password');
+                req.flash('error', 'Invalid Username/Password');
                 return done(null,false);
             }
             return done(null,user);
-        }).catch((Error)=>{console.log('Error in finding user ---> Passport');
-        return done(err);});
+        }).catch((err)=>{
+            req.flash('error', err);
+            return done(err);
+        });
     }
 ));
 
@@ -49,7 +52,7 @@ passport.checkAuthentication = function(req,res,next){
 passport.setAuthenticatedUser = function(req,res,next){
     if(req.isAuthenticated()){
         //req.user contains the currenet signed in user from the session cookie and we are just sending this to the locals for the view
-        res.locals.user=req.user;
+        res.locals.user = req.user;
     }
     next();
 }

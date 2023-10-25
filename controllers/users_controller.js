@@ -14,8 +14,12 @@ module.exports.profile=function(req,res){
 
 module.exports.update = function(req,res){
     if(req.user.id = req.params.id){
-        User.findByIdAndUpdate(req.params.id, req.body).then((user)=>{return res.redirect('back');});
+        User.findByIdAndUpdate(req.params.id, req.body).then((user)=>{
+            req.flash('success', 'Updated!');
+            return res.redirect('back');
+        });
     }else{
+        req.flash('error', 'Unauthorized!');
         return res.status(401).send('Unauthorized');
     }
 }
@@ -44,24 +48,36 @@ module.exports.signIn=function(req,res){
 //get the sign-up data
 module.exports.create = function(req, res){
     if(req.body.password != req.body.confirm_password){
+        req.flash('error', 'Passwords do not match');
         return res.redirect('back');
     }
     User.findOne({email: req.body.email}).then((user)=>{
         if(!user){
-            User.create(req.body).then(res.redirect('/users/sign-in')).catch((Error)=>{console.log('error in creating user while signing up');});
+            User.create(req.body).then(()=>{
+                req.flash('success', 'You have signed up, login to continue!');
+                return res.redirect('/users/sign-in');
+            }).catch((err)=>{
+                req.flash('error', err);
+            });
         }else{
+            req.flash('error', 'User already exist!');
             return res.redirect('back');
         }
-    }).catch((Error)=>{console.log('error in finding user while signing up'); return});
+    }).catch((err)=>{
+        req.flash('error', err);
+        return res.redirect('back'); 
+    });
 }
 //sign in and create a session for the user
 module.exports.createSession = function(req, res){
+    req.flash('success', 'Logged in Successfully');
     return res.redirect('/');
 }
 
 module.exports.destroySession = function(req,res){
     req.logout(function(err) {
         if (err) { return next(err); }
+        req.flash('success', 'You have logged out!');
         return res.redirect('/users/sign-in');
     });
 }
