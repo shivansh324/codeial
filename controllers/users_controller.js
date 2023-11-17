@@ -1,4 +1,6 @@
 const User = require("../models/user");
+const fs = require('fs');
+const path = require('path');
 
 //lets not add async await in user's controller for now
 
@@ -12,16 +14,39 @@ module.exports.profile=function(req,res){
     
 }
 
-module.exports.update = function(req,res){
+module.exports.update = async function(req,res){
     if(req.user.id = req.params.id){
-        User.findByIdAndUpdate(req.params.id, req.body).then((user)=>{
-            req.flash('success', 'Updated!');
+        try{
+            let user = await User.findByIdAndUpdate(req.params.id);
+            User.uploadAvatar(req, res, function(err){//cant't access form from req.params directly because now form is multipart/form-date so access them from multer defined function
+                if(err){console.log("Multer Error: ",err)}
+
+                user.name = req.body.name;
+                user.email =    req.body.email;
+
+                
+                if(req.file){
+
+                    if(user.avatar){
+                        fs.unlinkSync(path.join(__dirname,'..',user.avatar))
+                    }
+
+                    //saving the path of uploaded file into db
+                    user.avatar = User.avatarPath + '/' + req.file.filename
+                }
+                user.save();
+                req.flash('success', 'Updated!');
+                return res.redirect('back');
+            })
+        }catch(err){
+            req.flash('error',err);
             return res.redirect('back');
-        });
+        }
     }else{
         req.flash('error', 'Unauthorized!');
         return res.status(401).send('Unauthorized');
     }
+
 }
 
 //render the sign up page
