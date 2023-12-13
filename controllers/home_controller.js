@@ -7,7 +7,7 @@ module.exports.home=async function(req,res){
         let posts = await Post.find({})
         .sort('-createdAt')
         .populate('user')
-        .populate({
+        .populate({//pupulating multiple models(nested pupulation)
                 path: 'comments',
                 populate: {
                     path: 'user'
