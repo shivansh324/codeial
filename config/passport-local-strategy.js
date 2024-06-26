@@ -10,7 +10,7 @@ passport.use(new LocalStrategy({
         passReqToCallback: true
     },
     function(req, email,password,done){//"done" already exists in passport.js lib
-        //find a user and establish the identity        
+        //find a user and establish the identity
         User.findOne({email: email}).then((user)=>{
             if(!user || user.password != password){
                 req.flash('error', 'Invalid Username/Password');
