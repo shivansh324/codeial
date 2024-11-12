@@ -1,1 +1,1 @@
-A small social website for posting blogs showcasing the backend profiency with nodejs, cookie-parser, passport authentication, REST API, Mongoose, and much more.
+A small social website for posting blogs showcasing the backend profiency with nodejs, cookie-parser, passport authentication, REST API, Mongoose, and a minimal frontend with HTML, CSS, JS and Bootstrap 5.
